@@ -41,6 +41,17 @@ function extractJson(s) {
   return null;
 }
 
+// Traduce el error de Claude a algo accionable para mostrar en la app
+function explain(msg) {
+  const m = String(msg || '');
+  if (/credit balance|billing/i.test(m)) return 'Tu cuenta de la API de Claude no tiene saldo. Cargá crédito en console.anthropic.com → Billing.';
+  if (/ 401/.test(m) || /authentication|invalid x-api-key/i.test(m)) return 'La clave de Claude es inválida. Revisá ANTHROPIC_API_KEY en Vercel y hacé Redeploy.';
+  if (/ 404/.test(m) || /not_found|model/i.test(m)) return 'El modelo de Claude no existe para tu cuenta. Probá poner CLAUDE_MODEL = claude-sonnet-5-5 en Vercel.';
+  if (/ 429/.test(m)) return 'Claude recibió demasiados pedidos seguidos. Esperá unos segundos.';
+  if (/ 529| 5\d\d/.test(m)) return 'Claude está saturado en este momento. Probá de nuevo en un rato.';
+  return 'Claude no respondió: ' + m.slice(0, 160);
+}
+
 async function withClaude(mode, text, context, key) {
   const prompt = mode === 'toEs' ? promptToEs(text, context) : promptToEn(text, context);
   const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -92,11 +103,12 @@ export default async function handler(req, res) {
 
   try {
     const key = process.env.ANTHROPIC_API_KEY;
+    let notice = 'Falta cargar ANTHROPIC_API_KEY en Vercel (Settings → Environment Variables) y hacer Redeploy.';
     if (key) {
       try { return res.status(200).json(await withClaude(mode, clean, ctx, key)); }
-      catch (e) { console.error(e.message); /* si falla Claude, pasa al respaldo */ }
+      catch (e) { console.error(e.message); notice = explain(e.message); /* si falla Claude, pasa al respaldo */ }
     }
-    return res.status(200).json(await withMyMemory(mode, clean));
+    return res.status(200).json({ ...(await withMyMemory(mode, clean)), notice });
   } catch (e) {
     console.error(e.message);
     return res.status(502).json({ error: 'No se pudo traducir. Probá de nuevo en unos segundos.' });

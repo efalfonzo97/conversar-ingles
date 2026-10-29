@@ -126,11 +126,11 @@ details summary{cursor:pointer}
     <section class="box panel" aria-labelledby="hM">
       <div>
         <h2 id="hM">Lo que respondo</h2>
-        <p class="sub">Escribí tu respuesta en castellano.</p>
+        <p class="sub">Escribí en castellano: se traduce solo cuando hacés una pausa.</p>
       </div>
       <textarea id="mine" placeholder="Ej.: Se llama Pablo, tiene 34 años y es muy divertido."></textarea>
       <div class="row">
-        <button class="primary" id="goMine">Pasar al inglés</button>
+        <button class="primary" id="goMine">Guardar en la charla</button>
         <span class="hint">Ctrl + Enter</span>
         <span class="grow"></span>
         <label class="hint" for="voice">Voz:</label>
@@ -177,16 +177,17 @@ details summary{cursor:pointer}
   const setStatus = (el, msg, err) => { el.hidden = !msg; el.textContent = msg || ''; el.className = 'status' + (err ? ' err' : ''); };
 
   // ---------- Servidor ----------
-  async function api(mode, text) {
+  async function api(mode, text, signal) {
     const r = await fetch('/api/translate', {
-      method: 'POST',
+      method: 'POST', signal,
       headers: { 'content-type': 'application/json', 'x-access-code': store.get(AKEY, '') },
       body: JSON.stringify({ mode, text, context: ctxText() })
     });
     const data = await r.json().catch(() => ({}));
     if (r.status === 401) { $('accessBox').hidden = false; throw new Error('Falta el código de acceso (abajo de todo).'); }
     if (!r.ok) throw new Error(data.error || 'No se pudo traducir.');
-    $('engine').textContent = data.engine === 'claude' ? 'Traduciendo con Claude' : 'Modo gratuito: solo traducción';
+    $('engine').textContent = data.engine === 'claude' ? 'Traduciendo con Claude' : 'Modo gratuito: sin pronunciación';
+    $('engine').title = data.notice || '';
     return data;
   }
   $('saveAccess').onclick = () => { store.set(AKEY, $('access').value.trim()); $('accessBox').hidden = true; };
@@ -298,7 +299,7 @@ details summary{cursor:pointer}
         ${words.length ? `<span class="kw">${words.map(w => `<b>${esc(w.en)}</b> = ${esc(w.es)}`).join(' · ')}</span>` : ''}
         <div class="row"><button class="small" data-a="hear">▶ Escuchar</button>${reply ? `<button class="small" data-a="reply">Responder: “${esc(reply.length > 50 ? reply.slice(0, 50) + '…' : reply)}”</button>` : ''}</div>`;
       el.querySelector('[data-a="hear"]').onclick = () => speak(text, 0.85, statusH);
-      if (reply) el.querySelector('[data-a="reply"]').onclick = () => { $('mine').value = reply; $('mine').focus(); };
+      if (reply) el.querySelector('[data-a="reply"]').onclick = () => { $('mine').value = reply; $('mine').focus(); liveTranslate(); };
     } catch (e) {
       el.querySelector('.es-t').textContent = e.message;
     }
@@ -312,7 +313,8 @@ details summary{cursor:pointer}
     const words = r.words || [];
     $('resMine').innerHTML = `
       <div><div class="cap">En inglés</div><p class="en">${esc(r.en)}</p></div>
-      ${r.phonetic ? `<div><div class="cap">Cómo se pronuncia</div><p class="phon">${mark(r.phonetic)}</p></div>` : ''}
+      ${r.phonetic ? `<div><div class="cap">Cómo se pronuncia</div><p class="phon">${mark(r.phonetic)}</p></div>`
+        : `<p class="status err">Sin pronunciación: ${esc(r.notice || 'Claude no respondió y se usó el traductor gratuito.')}</p>`}
       <div class="row">
         <button class="small" data-a="play">▶ Escuchar</button>
         <button class="small" data-a="slow">▶ Más lento</button>
@@ -326,18 +328,41 @@ details summary{cursor:pointer}
     q('slow').onclick = () => speak(r.en, 0.6, statusM);
     q('copy').onclick = async () => { try { await navigator.clipboard.writeText(r.en); q('copy').textContent = 'Copiado'; } catch { q('copy').textContent = 'No se pudo copiar'; } setTimeout(() => q('copy').textContent = 'Copiar', 1600); };
   }
+  // Traducción automática: espera una pausa al escribir, cancela el pedido anterior si seguís escribiendo
+  let typeTimer = null, liveCtl = null, lastText = '', lastResult = null;
+  async function liveTranslate() {
+    const text = $('mine').value.trim();
+    if (text.length < 3 || text === lastText) return lastResult;
+    liveCtl?.abort(); const ctl = liveCtl = new AbortController();
+    setStatus(statusM, 'Traduciendo…');
+    try {
+      const r = await api('toEn', text, ctl.signal);
+      if (ctl !== liveCtl) return null;                 // llegó tarde: ya hay un pedido más nuevo
+      if (!r.en) throw new Error('No llegó la traducción.');
+      lastText = text; lastResult = r; enCard(r); setStatus(statusM, '');
+      return r;
+    } catch (e) {
+      if (e.name !== 'AbortError' && ctl === liveCtl) setStatus(statusM, e.message, true);
+      return null;
+    }
+  }
+  $('mine').addEventListener('input', () => {
+    clearTimeout(typeTimer);
+    typeTimer = setTimeout(liveTranslate, 900);
+  });
+
   async function doMine() {
     const text = $('mine').value.trim();
     if (!text) { $('mine').focus(); return; }
-    const btn = $('goMine'); btn.disabled = true; setStatus(statusM, 'Traduciendo…');
+    clearTimeout(typeTimer);
+    const btn = $('goMine'); btn.disabled = true;
     try {
-      const r = await api('toEn', text);
-      if (!r.en) throw new Error('No llegó la traducción.');
-      enCard(r);
+      const r = text === lastText && lastResult ? lastResult : await liveTranslate();
+      if (!r) return;
       log.push({ who: 'm', en: r.en, es: text, phonetic: r.phonetic || '' }); saveLog();
-      $('mine').value = ''; setStatus(statusM, '');
-    } catch (e) { setStatus(statusM, e.message, true); }
-    finally { btn.disabled = false; }
+      $('mine').value = ''; lastText = ''; lastResult = null;
+      setStatus(statusM, 'Guardado en la charla. La traducción queda arriba para que la leas en voz alta.');
+    } finally { btn.disabled = false; }
   }
   $('goMine').onclick = doMine;
   $('mine').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); doMine(); } });
