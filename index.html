@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decilo en inglés · Conversar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Dos paneles: lo que escucho (en vivo) | lo que respondo; abajo, la charla completa */
+:root{
+  --bg:#eef2f4; --surface:#ffffff; --ink:#14232b; --muted:#56666f; --line:#d3dce1;
+  --accent:#0b6e75; --accent-ink:#ffffff; --accent-soft:#dcefef; --stress:#c2410c; --warn:#9a3412;
+  --them:#5b4bb7; --them-soft:#ebe8fa; --live:#dc2626;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0f181d; --surface:#17232a; --ink:#e3ecef; --muted:#97a7ae; --line:#2b3a42;
+  --accent:#4fc1c6; --accent-ink:#06282a; --accent-soft:#163a3d; --stress:#fb923c; --warn:#fdba74;
+  --them:#b3a8f5; --them-soft:#262243; --live:#f87171; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding:24px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.7rem,4.5vw,2.3rem);line-height:1.1;margin:0;letter-spacing:-.01em}
+header p{margin:6px 0 0;color:var(--muted);max-width:62ch}
+.engine{font-size:.8rem;color:var(--muted)}
+.cap{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.panel{display:flex;flex-direction:column;gap:12px;border-top:4px solid var(--accent)}
+.panel.them-p{border-top-color:var(--them)}
+.panel h2{font-family:var(--display);font-size:1.25rem;margin:0}
+.sub{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+textarea,input[type=text],input[type=password]{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;padding:10px 12px}
+textarea{min-height:90px;resize:vertical;font-size:1.05rem}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grow{flex:1 1 auto}
+button{font:inherit;cursor:pointer;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 16px;font-weight:700}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.them{background:var(--them);border-color:var(--them);color:#fff}
+button.rec{background:var(--live);border-color:var(--live);color:#fff}
+button.small{padding:5px 12px;font-size:.88rem}
+button:disabled{opacity:.55;cursor:default}
+select{font:inherit;border:1px solid var(--line);border-radius:999px;padding:7px 12px;background:var(--surface);color:var(--ink)}
+.hint{font-size:.85rem;color:var(--muted)}
+.status{font-size:.9rem;color:var(--muted);margin:0}
+.status.err{color:var(--warn)}
+.livebox{min-height:64px;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:1.1rem;overflow-wrap:anywhere}
+.livebox .interim{color:var(--muted)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--muted);margin-right:6px;vertical-align:middle}
+.dot.on{background:var(--live);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.tline{background:var(--them-soft);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;overflow-wrap:anywhere}
+.tline .en-t{font-weight:700}
+.tline .es-t{font-family:var(--display);font-size:1.15rem}
+.tline .kw{font-size:.88rem;color:var(--muted)}
+.feed{display:flex;flex-direction:column;gap:10px;max-height:460px;overflow-y:auto}
+.en{font-family:var(--display);font-weight:500;font-size:clamp(1.25rem,3.2vw,1.7rem);line-height:1.25;margin:4px 0 0;overflow-wrap:anywhere}
+.phon{font-family:var(--mono);font-size:1rem;line-height:1.6;background:var(--bg);border-radius:10px;padding:10px 12px;margin:6px 0 0;overflow-wrap:anywhere}
+.phon b,.words b,.log b{color:var(--stress);font-weight:600}
+.note{border-left:3px solid var(--accent);padding:4px 0 4px 12px;margin:0}
+.words{width:100%;border-collapse:collapse;font-size:.92rem}
+.words th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+.words td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.words td.p{font-family:var(--mono);font-size:.88rem}
+.tablewrap{overflow-x:auto}
+.result{display:flex;flex-direction:column;gap:12px}
+.log{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.turn{border-radius:12px;padding:10px 14px;max-width:85%;display:flex;flex-direction:column;gap:2px;overflow-wrap:anywhere}
+.turn.t{background:var(--them-soft);align-self:flex-start}
+.turn.m{background:var(--accent-soft);align-self:flex-end}
+.turn .who{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.turn .main{font-weight:700}
+.turn .sec{color:var(--muted);font-size:.92rem}
+.turn .ph{font-family:var(--mono);font-size:.85rem}
+details summary{cursor:pointer}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Decilo en inglés</h1>
+      <p>Escucho a tu teacher en vivo y lo paso al castellano. Vos escribís tu respuesta en castellano y te la doy en inglés, con la pronunciación y el audio.</p>
+    </div>
+    <span class="engine" id="engine"></span>
+  </header>
+
+  <div class="split">
+    <!-- ===== ESCUCHO ===== -->
+    <section class="box panel them-p" aria-labelledby="hT">
+      <div>
+        <h2 id="hT">Lo que escucho</h2>
+        <p class="sub">Poné Meet, Zoom o Teams en altavoz y tocá "Escuchar".</p>
+      </div>
+      <div class="row">
+        <button class="them" id="listen">🎙 Escuchar</button>
+        <select id="lang" aria-label="Acento a reconocer">
+          <option value="en-US">Inglés (EE. UU.)</option>
+          <option value="en-GB">Inglés (Reino Unido)</option>
+        </select>
+        <span class="hint grow" id="micState"><span class="dot" id="dot"></span>Micrófono apagado</span>
+      </div>
+      <div class="livebox" id="live" aria-live="polite"><span class="interim">Lo que se escuche aparece acá mientras hablan…</span></div>
+      <details>
+        <summary class="hint">Escribir una frase a mano</summary>
+        <div class="row" style="margin-top:8px">
+          <input type="text" id="heard" placeholder="Ej.: What's your best friend like?" class="grow">
+          <button class="small" id="goHeard">Traducir</button>
+        </div>
+      </details>
+      <div class="cap">Traducciones</div>
+      <div class="feed" id="feed"><p class="hint" id="feedEmpty">Cada frase que diga tu teacher aparece acá traducida, con una respuesta sugerida.</p></div>
+      <p class="status" id="statusH" hidden></p>
+    </section>
+
+    <!-- ===== RESPONDO ===== -->
+    <section class="box panel" aria-labelledby="hM">
+      <div>
+        <h2 id="hM">Lo que respondo</h2>
+        <p class="sub">Escribí tu respuesta en castellano.</p>
+      </div>
+      <textarea id="mine" placeholder="Ej.: Se llama Pablo, tiene 34 años y es muy divertido."></textarea>
+      <div class="row">
+        <button class="primary" id="goMine">Pasar al inglés</button>
+        <span class="hint">Ctrl + Enter</span>
+        <span class="grow"></span>
+        <label class="hint" for="voice">Voz:</label>
+        <select id="voice">
+          <option value="en-GB">Británica</option>
+          <option value="en-US">Estadounidense</option>
+        </select>
+      </div>
+      <div id="resMine" class="result" aria-live="polite"></div>
+      <p class="status" id="statusM" hidden></p>
+    </section>
+  </div>
+
+  <section class="box" aria-labelledby="hLog">
+    <div class="row">
+      <div class="cap grow" id="hLog">La charla</div>
+      <button class="small" id="dl">Descargar</button>
+      <button class="small" id="clearLog">Empezar de nuevo</button>
+    </div>
+    <p class="hint" id="logEmpty">Acá quedan las frases de los dos en orden, para repasar la clase al final.</p>
+    <div class="log" id="log"></div>
+  </section>
+
+  <section class="box" id="accessBox" hidden>
+    <label class="cap" for="access">Código de acceso</label>
+    <p class="sub">Esta app tiene un código para que nadie más use tu clave. Escribilo una vez y queda guardado en este navegador.</p>
+    <div class="row" style="margin-top:8px">
+      <input type="password" id="access" class="grow" autocomplete="current-password">
+      <button class="primary small" id="saveAccess">Guardar</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const LKEY = 'decilo-charla', AKEY = 'decilo-acceso';
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const mark = s => esc(s).replace(/(^|[\s\-·(])([A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ']*)(?=$|[\s\-·.,!?;:)])/g, (m,a,b) => a + '<b>' + b + '</b>');
+  const store = {
+    get(k, d){ try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d; } catch { return d; } },
+    set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const setStatus = (el, msg, err) => { el.hidden = !msg; el.textContent = msg || ''; el.className = 'status' + (err ? ' err' : ''); };
+
+  // ---------- Servidor ----------
+  async function api(mode, text) {
+    const r = await fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-access-code': store.get(AKEY, '') },
+      body: JSON.stringify({ mode, text, context: ctxText() })
+    });
+    const data = await r.json().catch(() => ({}));
+    if (r.status === 401) { $('accessBox').hidden = false; throw new Error('Falta el código de acceso (abajo de todo).'); }
+    if (!r.ok) throw new Error(data.error || 'No se pudo traducir.');
+    $('engine').textContent = data.engine === 'claude' ? 'Traduciendo con Claude' : 'Modo gratuito: solo traducción';
+    return data;
+  }
+  $('saveAccess').onclick = () => { store.set(AKEY, $('access').value.trim()); $('accessBox').hidden = true; };
+
+  // ---------- La charla ----------
+  let log = store.get(LKEY, []);
+  const ctxText = () => log.slice(-6).map(t => (t.who === 't' ? 'Teacher: ' : 'Alumno: ') + t.en).join('\n');
+  function drawLog() {
+    $('logEmpty').hidden = log.length > 0;
+    $('log').innerHTML = log.map(t => t.who === 't'
+      ? `<div class="turn t"><span class="who">Teacher</span><span class="main">${esc(t.en)}</span><span class="sec">${esc(t.es || '…')}</span></div>`
+      : `<div class="turn m"><span class="who">Vos</span><span class="main">${esc(t.en)}</span>${t.phonetic ? `<span class="ph">${mark(t.phonetic)}</span>` : ''}<span class="sec">${esc(t.es)}</span></div>`).join('');
+  }
+  const saveLog = () => { log = log.slice(-80); store.set(LKEY, log); drawLog(); };
+  $('clearLog').onclick = () => { log = []; saveLog(); $('feed').innerHTML = ''; $('feedEmpty') || $('feed').insertAdjacentHTML('beforeend', '<p class="hint" id="feedEmpty">Cada frase que diga tu teacher aparece acá traducida.</p>'); $('resMine').innerHTML = ''; };
+  $('dl').onclick = () => {
+    const txt = log.map(t => t.who === 't' ? `TEACHER: ${t.en}\n  → ${t.es || ''}` : `YO: ${t.en}\n  (${t.es})${t.phonetic ? `\n  Suena: ${t.phonetic}` : ''}`).join('\n\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt || 'Sin frases todavía.'], { type: 'text/plain' }));
+    a.download = `charla-ingles-${new Date().toISOString().slice(0,10)}.txt`; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  };
+
+  // ---------- Voz (texto a audio) ----------
+  const synth = window.speechSynthesis;
+  let resumeAfterTTS = false;
+  function speak(text, rate, statusEl) {
+    if (!synth) { setStatus(statusEl, 'Este navegador no tiene voz disponible.', true); return; }
+    synth.cancel();
+    if (listening) { resumeAfterTTS = true; stopListening(true); }   // que el micrófono no se escuche a sí mismo
+    const u = new SpeechSynthesisUtterance(text), lang = $('voice').value;
+    u.lang = lang; u.rate = rate;
+    const vs = synth.getVoices(); const v = vs.find(v => v.lang === lang) || vs.find(v => v.lang?.startsWith('en'));
+    if (v) u.voice = v;
+    u.onend = u.onerror = () => { if (resumeAfterTTS) { resumeAfterTTS = false; startListening(); } };
+    synth.speak(u);
+  }
+  $('voice').value = store.get('decilo-voz', 'en-GB');
+  $('voice').onchange = () => store.set('decilo-voz', $('voice').value);
+  $('lang').value = store.get('decilo-escucha', 'en-US');
+  $('lang').onchange = () => { store.set('decilo-escucha', $('lang').value); if (listening) { stopListening(true); startListening(); } };
+
+  // ---------- Escuchar en vivo ----------
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, listening = false, buffer = '', flushTimer = null;
+  const statusH = $('statusH');
+
+  function setMic(on) {
+    $('dot').classList.toggle('on', on);
+    $('micState').lastChild.textContent = on ? 'Escuchando…' : 'Micrófono apagado';
+    $('listen').textContent = on ? '⏸ Pausar' : '🎙 Escuchar';
+    $('listen').className = on ? 'rec' : 'them';
+  }
+  function showLive(interim) {
+    $('live').innerHTML = (buffer || interim) ? `${esc(buffer)} <span class="interim">${esc(interim)}</span>` : '<span class="interim">Esperando que hablen…</span>';
+  }
+  function flush() {
+    const text = buffer.trim(); buffer = ''; showLive('');
+    if (text.split(/\s+/).length >= 2 || /\?$/.test(text)) addTeacherLine(text);
+  }
+
+  function startListening() {
+    if (!SR) { setStatus(statusH, 'Este navegador no reconoce voz. Usá Chrome o Edge en la computadora.', true); return; }
+    if (!rec) {
+      rec = new SR();
+      rec.continuous = true; rec.interimResults = true;
+      rec.onresult = e => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript;
+          if (e.results[i].isFinal) buffer += ' ' + t.trim(); else interim += t;
+        }
+        showLive(interim);
+        clearTimeout(flushTimer);
+        if (buffer.trim()) flushTimer = setTimeout(flush, 1400);   // espera una pausa antes de traducir
+      };
+      rec.onerror = e => {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { listening = false; setMic(false); setStatus(statusH, 'El navegador bloqueó el micrófono. Permitilo con el ícono del candado en la barra de direcciones.', true); }
+        else if (e.error === 'audio-capture') { listening = false; setMic(false); setStatus(statusH, 'No encuentro un micrófono conectado.', true); }
+        else if (e.error === 'network') setStatus(statusH, 'Sin conexión con el servicio de voz. Reintentando…', true);
+      };
+      rec.onend = () => { if (listening) { try { rec.start(); } catch {} } };  // el navegador corta solo tras un silencio
+    }
+    rec.lang = $('lang').value;
+    listening = true; setMic(true); setStatus(statusH, ''); showLive('');
+    try { rec.start(); } catch {}
+  }
+  function stopListening(silent) {
+    listening = false; setMic(false);
+    try { rec && rec.stop(); } catch {}
+    if (!silent) { clearTimeout(flushTimer); if (buffer.trim()) flush(); }
+  }
+  $('listen').onclick = () => listening ? stopListening() : startListening();
+  if (!SR) setStatus(statusH, 'Este navegador no reconoce voz. Usá Chrome o Edge en la computadora. Igual podés escribir frases a mano.', true);
+
+  // ---------- Frases del teacher ----------
+  async function addTeacherLine(text) {
+    $('feedEmpty')?.remove();
+    const turn = { who: 't', en: text, es: '' }; log.push(turn); saveLog();
+    const el = document.createElement('div'); el.className = 'tline';
+    el.innerHTML = `<span class="en-t">${esc(text)}</span><span class="es-t">Traduciendo…</span>`;
+    $('feed').prepend(el);
+    try {
+      const r = await api('toEs', text);
+      turn.es = String(r.es || ''); saveLog();
+      const words = Array.isArray(r.words) ? r.words.filter(w => w && w.en).slice(0, 4) : [];
+      const reply = String(r.reply_es || '').trim();
+      el.innerHTML = `<span class="en-t">${esc(text)}</span><span class="es-t">${esc(turn.es)}</span>
+        ${words.length ? `<span class="kw">${words.map(w => `<b>${esc(w.en)}</b> = ${esc(w.es)}`).join(' · ')}</span>` : ''}
+        <div class="row"><button class="small" data-a="hear">▶ Escuchar</button>${reply ? `<button class="small" data-a="reply">Responder: “${esc(reply.length > 50 ? reply.slice(0, 50) + '…' : reply)}”</button>` : ''}</div>`;
+      el.querySelector('[data-a="hear"]').onclick = () => speak(text, 0.85, statusH);
+      if (reply) el.querySelector('[data-a="reply"]').onclick = () => { $('mine').value = reply; $('mine').focus(); };
+    } catch (e) {
+      el.querySelector('.es-t').textContent = e.message;
+    }
+  }
+  $('goHeard').onclick = () => { const t = $('heard').value.trim(); if (t) { addTeacherLine(t); $('heard').value = ''; } };
+  $('heard').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('goHeard').click(); } });
+
+  // ---------- Mi respuesta ----------
+  const statusM = $('statusM');
+  function enCard(r) {
+    const words = r.words || [];
+    $('resMine').innerHTML = `
+      <div><div class="cap">En inglés</div><p class="en">${esc(r.en)}</p></div>
+      ${r.phonetic ? `<div><div class="cap">Cómo se pronuncia</div><p class="phon">${mark(r.phonetic)}</p></div>` : ''}
+      <div class="row">
+        <button class="small" data-a="play">▶ Escuchar</button>
+        <button class="small" data-a="slow">▶ Más lento</button>
+        <button class="small" data-a="copy">Copiar</button>
+      </div>
+      ${r.note ? `<p class="note">${esc(r.note)}</p>` : ''}
+      ${words.length ? `<div class="tablewrap"><table class="words"><thead><tr><th>Inglés</th><th>Suena</th><th>Significa</th></tr></thead><tbody>
+        ${words.map(w => `<tr><td>${esc(w.en)}</td><td class="p">${mark(w.phonetic || '')}</td><td>${esc(w.es || '')}</td></tr>`).join('')}</tbody></table></div>` : ''}`;
+    const q = s => $('resMine').querySelector(`[data-a="${s}"]`);
+    q('play').onclick = () => speak(r.en, 0.95, statusM);
+    q('slow').onclick = () => speak(r.en, 0.6, statusM);
+    q('copy').onclick = async () => { try { await navigator.clipboard.writeText(r.en); q('copy').textContent = 'Copiado'; } catch { q('copy').textContent = 'No se pudo copiar'; } setTimeout(() => q('copy').textContent = 'Copiar', 1600); };
+  }
+  async function doMine() {
+    const text = $('mine').value.trim();
+    if (!text) { $('mine').focus(); return; }
+    const btn = $('goMine'); btn.disabled = true; setStatus(statusM, 'Traduciendo…');
+    try {
+      const r = await api('toEn', text);
+      if (!r.en) throw new Error('No llegó la traducción.');
+      enCard(r);
+      log.push({ who: 'm', en: r.en, es: text, phonetic: r.phonetic || '' }); saveLog();
+      $('mine').value = ''; setStatus(statusM, '');
+    } catch (e) { setStatus(statusM, e.message, true); }
+    finally { btn.disabled = false; }
+  }
+  $('goMine').onclick = doMine;
+  $('mine').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); doMine(); } });
+
+  drawLog();
+})();
+</script>
+</body>
+</html>

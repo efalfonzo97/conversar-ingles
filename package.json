@@ -1,0 +1,8 @@
+{
+  "name": "conversar-ingles",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Escucha en vivo, traduce al castellano y te ayuda a responder en inglés con pronunciación.",
+  "engines": { "node": ">=18" }
+}
