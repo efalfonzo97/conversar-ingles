@@ -25,11 +25,12 @@ package.json
 | `ANTHROPIC_API_KEY` | Recomendada | Activa la traducción con Claude: pronunciación, consejos y respuestas sugeridas. Sin ella, la app usa MyMemory (solo traducción). |
 | `ACCESS_CODE` | Recomendada si cargás la clave | Un código que la app pide una vez, para que nadie más use tu clave si encuentra la URL. |
 | `CLAUDE_MODEL` | No | Modelo a usar. Por defecto `claude-haiku-5-5` (rápido y barato). |
+| `ANTHROPIC_WORKSPACE_ID` | Solo si tu clave no tiene workspace | El ID del workspace (empieza con `wrkspc_`). Si al crear la clave elegís el workspace "Default", no hace falta. |
 | `MYMEMORY_EMAIL` | No | Tu email: sube el límite gratuito de MyMemory de ~5.000 a ~50.000 caracteres por día. |
 
 3. Volvé a desplegar (**Redeploy**) para que tome las variables.
 
-La clave de Claude se crea en [console.anthropic.com](https://console.anthropic.com). Nunca va en el HTML: solo la lee la función del servidor.
+La clave de Claude se crea en [platform.claude.com/settings/keys](https://platform.claude.com/settings/keys) (Create key → elegí el workspace "Default"). Nunca va en el HTML: solo la lee la función del servidor.
 
 ## Probarla en tu compu
 

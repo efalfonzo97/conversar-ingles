@@ -44,6 +44,7 @@ function extractJson(s) {
 // Traduce el error de Claude a algo accionable para mostrar en la app
 function explain(msg) {
   const m = String(msg || '');
+  if (/anthropic-workspace-id/i.test(m)) return 'Tu clave no está asignada a un workspace. Creá una nueva eligiendo el workspace "Default", o cargá ANTHROPIC_WORKSPACE_ID en Vercel.';
   if (/credit balance|billing/i.test(m)) return 'Tu cuenta de la API de Claude no tiene saldo. Cargá crédito en console.anthropic.com → Billing.';
   if (/ 401/.test(m) || /authentication|invalid x-api-key/i.test(m)) return 'La clave de Claude es inválida. Revisá ANTHROPIC_API_KEY en Vercel y hacé Redeploy.';
   if (/ 404/.test(m) || /not_found|model/i.test(m)) return 'El modelo de Claude no existe para tu cuenta. Probá poner CLAUDE_MODEL = claude-sonnet-5-5 en Vercel.';
@@ -56,7 +57,13 @@ async function withClaude(mode, text, context, key) {
   const prompt = mode === 'toEs' ? promptToEs(text, context) : promptToEn(text, context);
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+    headers: {
+      'authorization': `Bearer ${key}`,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+      // Solo hace falta si la clave no está limitada a un workspace
+      ...(process.env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID } : {})
+    },
     body: JSON.stringify({
       model: process.env.CLAUDE_MODEL || 'claude-haiku-5-5',
       max_tokens: 800,
