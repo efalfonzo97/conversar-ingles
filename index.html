@@ -23,6 +23,7 @@
   --accent:#4fc1c6; --accent-ink:#06282a; --accent-soft:#163a3d; --stress:#fb923c; --warn:#fdba74;
   --them:#b3a8f5; --them-soft:#262243; --live:#f87171; color-scheme:dark}}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding:24px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
 .wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
@@ -91,7 +92,10 @@ details summary{cursor:pointer}
       <h1>Decilo en inglés</h1>
       <p>Escucho a tu teacher en vivo y lo paso al castellano. Vos escribís tu respuesta en castellano y te la doy en inglés, con la pronunciación y el audio.</p>
     </div>
-    <span class="engine" id="engine"></span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <a href="/entrenar.html" style="color:var(--accent);font-weight:700;text-decoration:none">Entrenar →</a>
+      <span class="engine" id="engine"></span>
+    </div>
   </header>
 
   <div class="split">

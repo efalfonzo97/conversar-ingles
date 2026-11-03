@@ -5,6 +5,7 @@ App para seguir una clase o una llamada en inglés:
 - **Lo que escucho:** con Meet, Zoom o Teams en altavoz, el micrófono transcribe en vivo lo que dice tu teacher y lo traduce al castellano, con palabras clave y una respuesta sugerida.
 - **Lo que respondo:** escribís en castellano y te devuelve el inglés, la pronunciación escrita a la española y el audio.
 - **La charla:** queda todo guardado en orden y lo podés descargar como .txt.
+- **Entrenar** (`/entrenar.html`): sesiones diarias de repaso espaciado con las preguntas clásicas y las frases de tus clases. Tres ejercicios por tarjeta (entender, dictado y decirla vos), con micrófono para responder en voz alta. No usa la API: es gratis.
 
 ## Estructura
 

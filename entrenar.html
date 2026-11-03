@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decilo en inglés · Entrenar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Una tarjeta por vez en el centro: escuchar → responder → ver → calificar. Arriba, el estado del mazo. */
+:root{
+  --bg:#eef2f4; --surface:#ffffff; --ink:#14232b; --muted:#56666f; --line:#d3dce1;
+  --accent:#0b6e75; --accent-ink:#ffffff; --accent-soft:#dcefef; --stress:#c2410c; --warn:#9a3412;
+  --them:#5b4bb7; --them-soft:#ebe8fa; --good:#15803d; --good-soft:#dcfce7; --mid:#a16207; --mid-soft:#fef3c7; --bad:#b91c1c; --bad-soft:#fee2e2; --live:#dc2626;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0f181d; --surface:#17232a; --ink:#e3ecef; --muted:#97a7ae; --line:#2b3a42;
+  --accent:#4fc1c6; --accent-ink:#06282a; --accent-soft:#163a3d; --stress:#fb923c; --warn:#fdba74;
+  --them:#b3a8f5; --them-soft:#262243; --good:#4ade80; --good-soft:#14331f; --mid:#fbbf24; --mid-soft:#3a2e0d; --bad:#f87171; --bad-soft:#3b1414; --live:#f87171; color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding:24px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.7rem,4.5vw,2.3rem);line-height:1.1;margin:0;letter-spacing:-.01em}
+header p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+nav a{color:var(--accent);font-weight:700;text-decoration:none}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.cap{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--display);font-size:1.8rem;line-height:1;font-variant-numeric:tabular-nums}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grow{flex:1 1 auto}
+button{font:inherit;cursor:pointer;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 16px;font-weight:700}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);padding:11px 24px}
+button.rec{background:var(--live);border-color:var(--live);color:#fff}
+button.small{padding:5px 12px;font-size:.88rem;font-weight:400}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+select,input[type=text]{font:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--bg);color:var(--ink)}
+input[type=text]{width:100%;font-size:1.1rem}
+select{border-radius:999px;background:var(--surface)}
+.hint{font-size:.88rem;color:var(--muted)}
+.card{display:flex;flex-direction:column;gap:16px}
+.chip{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.chip.ex{background:var(--them-soft);color:var(--them)}
+.instr{font-family:var(--display);font-size:1.25rem;font-weight:500;margin:0}
+.big{font-family:var(--display);font-weight:500;font-size:clamp(1.4rem,4vw,1.9rem);line-height:1.25;margin:0;overflow-wrap:anywhere}
+.phon{font-family:var(--mono);font-size:1rem;background:var(--bg);border-radius:10px;padding:10px 12px;margin:0;overflow-wrap:anywhere}
+.phon b{color:var(--stress);font-weight:600}
+.reveal{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.model{background:var(--accent-soft);border-radius:10px;padding:10px 12px}
+.heard{background:var(--bg);border-radius:10px;padding:10px 12px;overflow-wrap:anywhere}
+.score{font-weight:700}
+.w-ok{color:var(--good)} .w-miss{color:var(--bad);text-decoration:underline wavy}
+.grades{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.grades button{border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.grades button span{font-weight:400;font-size:.8rem;color:var(--muted)}
+.g-bad{background:var(--bad-soft);border-color:var(--bad-soft)}
+.g-mid{background:var(--mid-soft);border-color:var(--mid-soft)}
+.g-good{background:var(--good-soft);border-color:var(--good-soft)}
+.suggest{outline:3px solid var(--accent);outline-offset:1px}
+.bar{height:6px;background:var(--line);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.why ul{margin:8px 0 0;padding-left:20px}
+.why li{margin:6px 0}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--live);margin-right:6px;animation:pulse 1.2s infinite;vertical-align:middle}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Entrenar</h1>
+      <p>15 minutos por día: escuchás, respondés en voz alta y repasás cada frase justo antes de olvidarla.</p>
+    </div>
+    <nav><a href="/">← Conversar</a></nav>
+  </header>
+
+  <!-- ===== INICIO ===== -->
+  <div id="home" class="wrap" style="max-width:none">
+    <section class="box">
+      <div class="stats">
+        <div class="stat"><span class="cap">Para repasar hoy</span><b id="sDue">0</b></div>
+        <div class="stat"><span class="cap">Nuevas hoy</span><b id="sNew">0</b></div>
+        <div class="stat"><span class="cap">Dominadas</span><b id="sKnown">0</b><span class="hint" id="sTotal"></span></div>
+        <div class="stat"><span class="cap">Racha</span><b id="sStreak">0</b><span class="hint">días seguidos</span></div>
+      </div>
+      <div class="row" style="margin-top:18px">
+        <button class="primary" id="start">Empezar sesión</button>
+        <span class="hint grow" id="startHint"></span>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <label class="hint" for="voice">Voz:</label>
+        <select id="voice"><option value="en-GB">Británica</option><option value="en-US">Estadounidense</option></select>
+        <label class="hint" for="topic">Tema:</label>
+        <select id="topic"></select>
+      </div>
+    </section>
+
+    <section class="box">
+      <div class="row">
+        <div class="grow">
+          <div class="cap">Frases de tus clases</div>
+          <p class="hint" style="margin:4px 0 0" id="importHint">Las frases que tradujiste en "Conversar" se pueden sumar al entrenamiento.</p>
+        </div>
+        <button id="import">Sumar frases</button>
+      </div>
+    </section>
+
+    <details class="box why">
+      <summary class="cap" style="cursor:pointer">Por qué está armado así</summary>
+      <ul>
+        <li><b>Recordar en vez de releer.</b> Cada tarjeta te obliga a sacar la respuesta de la memoria antes de verla. Es la técnica con más respaldo para retener vocabulario.</li>
+        <li><b>Repaso espaciado.</b> Lo que sabés vuelve en 1, 3, 7, 14 y 30 días; lo que no, vuelve en la misma sesión. Repasás justo antes de olvidar.</li>
+        <li><b>Oído primero.</b> Las preguntas suenan antes de que veas el texto, a velocidad normal. Así entrenás reconocerlas como en una charla real.</li>
+        <li><b>Frases enteras, no palabras sueltas.</b> Aprendés bloques que se usan tal cual (<i>What do you do?</i>), que es lo que da fluidez.</li>
+        <li><b>Hablar en voz alta.</b> Producir la frase, no solo entenderla, es lo que la hace salir sola cuando la necesitás. El micrófono te muestra qué entendió.</li>
+        <li><b>La misma frase, de varias formas.</b> Cada tarjeta pasa por tres ejercicios a medida que la dominás: entender, escribir lo que oís y decirla vos.</li>
+      </ul>
+    </details>
+
+    <div class="row"><span class="grow"></span><button class="small" id="reset">Borrar mi progreso</button></div>
+    <section class="box" id="confirmReset" hidden>
+      <p style="margin:0 0 10px">¿Borrar todo tu progreso? Las tarjetas vuelven a empezar de cero.</p>
+      <div class="row"><button class="small" id="resetYes">Sí, borrar</button><button class="small" id="resetNo">Cancelar</button></div>
+    </section>
+  </div>
+
+  <!-- ===== SESIÓN ===== -->
+  <section id="session" class="box card" hidden aria-live="polite">
+    <div class="row">
+      <span class="hint" id="pos"></span>
+      <div class="bar grow"><i id="barFill" style="width:0"></i></div>
+      <button class="small" id="quit">Terminar</button>
+    </div>
+    <div class="row"><span class="chip" id="cat"></span><span class="chip ex" id="exName"></span></div>
+    <p class="instr" id="instr"></p>
+    <div id="prompt" class="card"></div>
+    <div id="reveal" class="reveal" hidden></div>
+  </section>
+
+  <!-- ===== FIN ===== -->
+  <section id="done" class="box card" hidden>
+    <p class="instr" id="doneTitle">¡Sesión terminada!</p>
+    <p id="doneText" style="margin:0"></p>
+    <div class="row"><button class="primary" id="again">Volver al inicio</button></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const mark = s => esc(s).replace(/(^|[\s\-·(])([A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ']*)(?=$|[\s\-·.,!?;:)])/g, (m,a,b) => a + '<b>' + b + '</b>');
+  const store = {
+    get(k, d){ try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d; } catch { return d; } },
+    set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+
+  // ---------- Mazo base ----------
+  const P = 'Presentarme', F = 'Familia', D = 'Describir personas', V = 'Viaje';
+  const BASE = [
+    [P,"What's your name?","¿Cómo te llamás?","uáts-ior NÉIM","My name's Esteban."],
+    [P,"How do you spell that?","¿Cómo se escribe?","jau du iu SPEL dat","E-S-T-E-B-A-N."],
+    [P,"Where are you from?","¿De dónde sos?","uér ar iu FROM","I'm from Argentina."],
+    [P,"Where do you live?","¿Dónde vivís?","uér da-ia LIV","I live in Buenos Aires."],
+    [P,"How old are you?","¿Cuántos años tenés?","jau ÓUL-dar iu","I'm 29."],
+    [P,"What do you do?","¿A qué te dedicás?","uá-da-ia DU","I'm a warranty analyst."],
+    [P,"Where do you work?","¿Dónde trabajás?","uér da-ia UÉRK","I work at Yamaha."],
+    [P,"Do you like your job?","¿Te gusta tu trabajo?","da-ia LÁIK ior YOB","Yes, I do. It's interesting."],
+    [P,"Why are you learning English?","¿Por qué estudiás inglés?","uái ar iu LÉR-ning ÍN-glish","Because I want to travel to Europe."],
+    [P,"What do you like doing?","¿Qué te gusta hacer?","uá-da-ia láik DÚ-ing","I like football and music."],
+    [P,"How are you?","¿Cómo estás?","jau ÁR iu","I'm fine, thanks. And you?"],
+    [P,"Nice to meet you.","Encantado de conocerte.","nais tu MÍ-chu","Nice to meet you too."],
+    [P,"What's your phone number?","¿Cuál es tu número de teléfono?","uáts-ior FÓUN NÁM-ber","It's oh one one, four five six seven, double eight nine oh."],
+    [P,"What's your email address?","¿Cuál es tu email?","uáts-ior Í-meil a-DRÉS","It's esteban dot alfonzo at gmail dot com."],
+    [F,"Are you married?","¿Estás casado?","ar iu MÁ-rid","No, I'm not. / Yes, I am."],
+    [F,"Do you have any children?","¿Tenés hijos?","da-ia jav É-ni CHÍL-dren","No, I don't."],
+    [F,"Do you have any brothers or sisters?","¿Tenés hermanos?","da-ia jav É-ni BRÁ-ders or SÍS-ters","Yes, I have a brother."],
+    [F,"What's your father's name?","¿Cómo se llama tu papá?","uáts-ior FÁ-ders NÉIM","His name's Fabián."],
+    [F,"What does your father do?","¿A qué se dedica tu papá?","uát das ior FÁ-der DU","He's a mechanic."],
+    [F,"Where do your parents live?","¿Dónde viven tus padres?","uér da-ior PÉ-rents LIV","They live in Pilar."],
+    [D,"What's your best friend like?","¿Cómo es tu mejor amigo?","uáts-ior best FRÉND láik","He's funny and friendly."],
+    [D,"What does he look like?","¿Cómo es físicamente?","uát das ji LÚK láik","He's tall and young."],
+    [D,"Who is she?","¿Quién es ella?","ju is SHI","She's my mother."],
+    [D,"Is he married or single?","¿Está casado o soltero?","is ji MÁ-rid or SÍN-gol","He's single."],
+    [V,"Is this your first time here?","¿Es tu primera vez acá?","is dis ior FÉRST táim jíer","Yes, it is."],
+    [V,"How long are you staying?","¿Cuánto tiempo te quedás?","jau LONG ar iu STÉI-ing","Two weeks."],
+    [V,"Where are you staying?","¿Dónde te alojás?","uér ar iu STÉI-ing","At a hotel in the city centre."],
+    [V,"What brings you here?","¿Qué te trae por acá?","uát BRINGS iu jíer","I'm on holiday."],
+    [V,"Can I see your passport, please?","¿Me muestra su pasaporte, por favor?","can ai SII ior PÁS-port pliis","Yes, here you are."],
+    [V,"Do you have a reservation?","¿Tiene una reserva?","da-ia jav a re-ser-VÉI-shon","Yes, it's under Alfonzo."],
+    [V,"Would you like anything else?","¿Desea algo más?","uú-yu láik É-ni-zing ELS","No, thank you. That's all."],
+    [V,"Cash or card?","¿Efectivo o tarjeta?","cash or CARD","Card, please."]
+  ].map(([cat,en,es,phon,ans], i) => ({ id: 'b' + i, cat, en, es, phon, ans }));
+
+  const SKEY = 'entrenar-estado', OKEY = 'entrenar-propias', MKEY = 'entrenar-meta';
+  const INTERVALS = [0, 1, 3, 7, 14, 30];   // días hasta el próximo repaso según la caja
+  const SESSION = 12, NEW_PER_DAY = 5;
+  const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+  const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+
+  let state = store.get(SKEY, {});          // id → {box, due}
+  let own = store.get(OKEY, []);
+  let meta = store.get(MKEY, { streak: 0, lastDay: '', newDay: '', newCount: 0 });
+  const allCards = () => BASE.concat(own);
+  const save = () => { store.set(SKEY, state); store.set(MKEY, meta); };
+
+  // ---------- Inicio ----------
+  function topics(){ return ['Todos', ...new Set(allCards().map(c => c.cat))]; }
+  function fillTopics(){
+    const cur = $('topic').value || store.get('entrenar-tema', 'Todos');
+    $('topic').innerHTML = topics().map(t => `<option>${esc(t)}</option>`).join('');
+    $('topic').value = topics().includes(cur) ? cur : 'Todos';
+  }
+  $('topic').onchange = () => { store.set('entrenar-tema', $('topic').value); drawHome(); };
+  function pool(){ const t = $('topic').value; return allCards().filter(c => t === 'Todos' || c.cat === t); }
+  function newLeft(){ return meta.newDay === today() ? Math.max(0, NEW_PER_DAY - meta.newCount) : NEW_PER_DAY; }
+  function drawHome(){
+    const p = pool(), t = today();
+    const due = p.filter(c => state[c.id] && state[c.id].due <= t).length;
+    const fresh = Math.min(newLeft(), p.filter(c => !state[c.id]).length);
+    const all = allCards();
+    $('sDue').textContent = due;
+    $('sNew').textContent = fresh;
+    $('sKnown').textContent = all.filter(c => state[c.id]?.box >= 3).length;
+    $('sTotal').textContent = `de ${all.length} frases`;
+    const yesterday = addDays(t, -1);
+    $('sStreak').textContent = (meta.lastDay === t || meta.lastDay === yesterday) ? meta.streak : 0;
+    $('start').disabled = due + fresh === 0;
+    $('startHint').textContent = due + fresh === 0 ? '¡Al día! Volvé mañana o elegí otro tema.' : `Unas ${Math.min(SESSION, due + fresh)} tarjetas, unos ${Math.max(5, Math.round(Math.min(SESSION, due + fresh) * 1.2))} minutos.`;
+    const charla = store.get('decilo-charla', []).filter(x => x.who === 't' && x.es);
+    const known = new Set(own.map(c => c.en.toLowerCase()));
+    const n = new Set(charla.filter(x => !known.has(x.en.toLowerCase())).map(x => x.en.toLowerCase())).size;
+    $('import').disabled = n === 0;
+    $('importHint').textContent = n ? `Tenés ${n} frase${n > 1 ? 's' : ''} nueva${n > 1 ? 's' : ''} de tus clases para sumar.` : (own.length ? `Ya sumaste ${own.length} frases de tus clases.` : 'Las frases que tradujiste en "Conversar" se pueden sumar al entrenamiento.');
+  }
+  $('import').onclick = () => {
+    const known = new Set(own.map(c => c.en.toLowerCase()));
+    store.get('decilo-charla', []).filter(x => x.who === 't' && x.es).forEach(x => {
+      const k = x.en.toLowerCase(); if (known.has(k)) return; known.add(k);
+      own.push({ id: 'c' + Date.now().toString(36) + own.length, cat: 'De mis clases', en: x.en, es: x.es, phon: '', ans: '' });
+    });
+    store.set(OKEY, own); fillTopics(); drawHome();
+  };
+  $('reset').onclick = () => $('confirmReset').hidden = false;
+  $('resetNo').onclick = () => $('confirmReset').hidden = true;
+  $('resetYes').onclick = () => { state = {}; meta = { streak: 0, lastDay: '', newDay: '', newCount: 0 }; save(); $('confirmReset').hidden = true; drawHome(); };
+
+  // ---------- Voz ----------
+  const synth = window.speechSynthesis;
+  $('voice').value = store.get('decilo-voz', 'en-GB');
+  $('voice').onchange = () => store.set('decilo-voz', $('voice').value);
+  function speak(text, rate = 1){
+    if (!synth) return;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text), lang = $('voice').value;
+    u.lang = lang; u.rate = rate;
+    const vs = synth.getVoices(); const v = vs.find(v => v.lang === lang) || vs.find(v => v.lang?.startsWith('en'));
+    if (v) u.voice = v;
+    synth.speak(u);
+  }
+
+  // ---------- Micrófono (una frase por vez) ----------
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  function listenOnce(btn, onText){
+    if (!SR) { onText(null, 'Este navegador no reconoce voz. Escribí tu respuesta.'); return; }
+    const rec = new SR(); rec.lang = $('voice').value; rec.interimResults = false; rec.maxAlternatives = 1;
+    const label = btn.innerHTML; btn.className = 'rec'; btn.innerHTML = '<span class="dot"></span>Te escucho…'; btn.disabled = true;
+    let got = false;
+    rec.onresult = e => { got = true; onText(e.results[0][0].transcript); };
+    rec.onerror = e => { onText(null, e.error === 'not-allowed' ? 'El navegador bloqueó el micrófono. Permitilo con el candado de la barra de direcciones.' : e.error === 'no-speech' ? 'No te escuché. Probá de nuevo, más cerca del micrófono.' : 'No pude escucharte. Probá de nuevo.'); };
+    rec.onend = () => { btn.className = ''; btn.innerHTML = label; btn.disabled = false; if (!got) {} };
+    try { rec.start(); } catch { btn.className = ''; btn.innerHTML = label; btn.disabled = false; }
+  }
+
+  // ---------- Comparar frases ----------
+  const CONTR = { "i'm":"i am","you're":"you are","he's":"he is","she's":"she is","it's":"it is","we're":"we are","they're":"they are","what's":"what is","name's":"name is","isn't":"is not","aren't":"are not","don't":"do not","doesn't":"does not","i've":"i have","that's":"that is","where's":"where is","who's":"who is" };
+  const words = s => String(s).toLowerCase().replace(/[’]/g, "'").replace(/[^a-z0-9' ]+/g, ' ').split(/\s+/).filter(Boolean).flatMap(w => (CONTR[w] || w).split(' '));
+  function compare(target, said){
+    const a = words(target), b = words(said);
+    const L = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+    for (let i = a.length - 1; i >= 0; i--) for (let j = b.length - 1; j >= 0; j--)
+      L[i][j] = a[i] === b[j] ? L[i+1][j+1] + 1 : Math.max(L[i+1][j], L[i][j+1]);
+    const hit = new Array(a.length).fill(false);
+    for (let i = 0, j = 0; i < a.length && j < b.length;) {
+      if (a[i] === b[j]) { hit[i] = true; i++; j++; } else if (L[i+1][j] >= L[i][j+1]) i++; else j++;
+    }
+    const score = a.length ? Math.round(100 * hit.filter(Boolean).length / a.length) : 0;
+    const html = a.map((w, i) => `<span class="${hit[i] ? 'w-ok' : 'w-miss'}">${esc(w)}</span>`).join(' ');
+    return { score, html };
+  }
+
+  // ---------- Sesión ----------
+  // Tipo de ejercicio según cuánto domina la tarjeta: entender → dictado → decirla vos
+  const EX = {
+    listen: { name: 'Entender', instr: 'Escuchá la pregunta y respondé en voz alta.' },
+    dict:   { name: 'Dictado',  instr: 'Escribí lo que escuchás.' },
+    speak:  { name: 'Decilo vos', instr: '¿Cómo se dice en inglés?' }
+  };
+  const exFor = c => { const b = state[c.id]?.box ?? 0; return b === 0 ? 'listen' : b === 1 ? 'dict' : ['speak','listen','dict'][(b - 2) % 3]; };
+
+  let queue = [], idx = 0, total = 0, results = { good: 0, mid: 0, bad: 0 }, requeued = new Set();
+
+  function startSession(){
+    const p = pool(), t = today();
+    const due = p.filter(c => state[c.id] && state[c.id].due <= t).sort((x, y) => state[x.id].due.localeCompare(state[y.id].due));
+    const fresh = p.filter(c => !state[c.id]).slice(0, newLeft());
+    queue = due.slice(0, SESSION);
+    queue = queue.concat(fresh.slice(0, Math.max(0, SESSION - queue.length)));
+    // mezclar un poco para no ir siempre en el mismo orden
+    for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [queue[i], queue[j]] = [queue[j], queue[i]]; }
+    idx = 0; total = queue.length; results = { good: 0, mid: 0, bad: 0 }; requeued = new Set();
+    if (!total) return;
+    $('home').hidden = true; $('done').hidden = true; $('session').hidden = false;
+    showCard();
+  }
+  $('start').onclick = startSession;
+  $('quit').onclick = () => finish(true);
+  $('again').onclick = () => { $('done').hidden = true; $('home').hidden = false; drawHome(); };
+
+  function showCard(){
+    const c = queue[idx], ex = exFor(c);
+    $('pos').textContent = `${Math.min(idx + 1, queue.length)} / ${queue.length}`;
+    $('barFill').style.width = `${Math.round(100 * idx / queue.length)}%`;
+    $('cat').textContent = c.cat; $('exName').textContent = EX[ex].name; $('instr').textContent = EX[ex].instr;
+    $('reveal').hidden = true; $('reveal').innerHTML = '';
+    const pr = $('prompt');
+
+    if (ex === 'listen') {
+      pr.innerHTML = `<div class="row"><button id="pPlay">▶ Escuchar</button><button id="pSlow">▶ Más lento</button><button id="pMic">🎙 Responder</button></div>
+        <div id="pHeard"></div>
+        <div class="row"><button class="primary" id="pShow">Ver la respuesta</button><span class="hint">Pensá la respuesta antes de mirar.</span></div>`;
+      $('pPlay').onclick = () => speak(c.en, 1); $('pSlow').onclick = () => speak(c.en, 0.6);
+      $('pMic').onclick = () => listenOnce($('pMic'), (txt, err) => { $('pHeard').innerHTML = txt ? `<div class="heard"><span class="cap">Te entendí</span><br>${esc(txt)}</div>` : `<p class="hint">${esc(err)}</p>`; });
+      $('pShow').onclick = () => reveal(c, ex, null);
+      speak(c.en, 1);
+    }
+    if (ex === 'dict') {
+      pr.innerHTML = `<div class="row"><button id="pPlay">▶ Escuchar</button><button id="pSlow">▶ Más lento</button></div>
+        <input type="text" id="pInput" placeholder="Escribí en inglés lo que escuchaste" autocomplete="off" spellcheck="false">
+        <div class="row"><button class="primary" id="pShow">Comprobar</button><span class="hint">Enter para comprobar</span></div>`;
+      $('pPlay').onclick = () => speak(c.en, 1); $('pSlow').onclick = () => speak(c.en, 0.6);
+      const go = () => reveal(c, ex, $('pInput').value);
+      $('pShow').onclick = go; $('pInput').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+      speak(c.en, 1); setTimeout(() => $('pInput')?.focus(), 50);
+    }
+    if (ex === 'speak') {
+      pr.innerHTML = `<p class="big">${esc(c.es)}</p>
+        <div class="row"><button id="pMic">🎙 Decilo</button><span class="hint">o escribilo:</span></div>
+        <input type="text" id="pInput" placeholder="Escribí la frase en inglés" autocomplete="off" spellcheck="false">
+        <div class="row"><button class="primary" id="pShow">Comprobar</button></div>`;
+      const go = () => reveal(c, ex, $('pInput').value);
+      $('pMic').onclick = () => listenOnce($('pMic'), (txt, err) => { if (txt) { $('pInput').value = txt; go(); } else $('pInput').placeholder = err; });
+      $('pShow').onclick = go; $('pInput').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    }
+  }
+
+  function reveal(c, ex, said){
+    $('prompt').querySelectorAll('button,input').forEach(el => el.disabled = true);
+    let cmp = null, suggest = null;
+    if (said !== null) { cmp = compare(c.en, said || ''); suggest = cmp.score >= 90 ? 'good' : cmp.score >= 60 ? 'mid' : 'bad'; }
+    const r = $('reveal');
+    r.innerHTML = `
+      <div><span class="cap">${ex === 'speak' ? 'Se dice' : 'Era'}</span><p class="big">${esc(c.en)}</p></div>
+      ${c.phon ? `<p class="phon">${mark(c.phon)}</p>` : ''}
+      <div class="hint">${esc(c.es)}</div>
+      ${cmp ? `<div class="heard"><span class="score">${cmp.score}% correcto</span> · ${cmp.html}<br><span class="hint">Escribiste o dijiste: “${esc(said || '—')}”</span></div>` : ''}
+      ${c.ans ? `<div class="model"><span class="cap">Podés responder</span><div class="row" style="margin-top:4px"><span class="grow">${esc(c.ans)}</span><button class="small" id="rAns">▶</button></div></div>` : ''}
+      <div class="row"><button class="small" id="rPlay">▶ Escuchar de nuevo</button><button class="small" id="rSlow">▶ Más lento</button></div>
+      <div class="cap">¿Cómo te fue?</div>
+      <div class="grades">
+        <button class="g-bad" data-g="bad">No lo sabía<span>vuelve en esta sesión</span></button>
+        <button class="g-mid" data-g="mid">Más o menos<span>vuelve mañana</span></button>
+        <button class="g-good" data-g="good">¡Lo sabía!<span>${INTERVALS[Math.min((state[c.id]?.box ?? 0) + 1, 5)]} día(s)</span></button>
+      </div>`;
+    r.hidden = false;
+    $('rPlay').onclick = () => speak(c.en, 1); $('rSlow').onclick = () => speak(c.en, 0.6);
+    if ($('rAns')) $('rAns').onclick = () => speak(c.ans.split(' / ')[0], 0.95);
+    if (suggest) r.querySelector(`[data-g="${suggest}"]`).classList.add('suggest');
+    r.querySelectorAll('[data-g]').forEach(b => b.onclick = () => grade(c, b.dataset.g));
+    if (ex !== 'listen') speak(c.en, 1);
+  }
+
+  function grade(c, g){
+    const t = today(), isNew = !state[c.id];
+    const cur = state[c.id] || { box: 0, due: t };
+    if (isNew) { if (meta.newDay !== t) { meta.newDay = t; meta.newCount = 0; } meta.newCount++; }
+    if (g === 'good') { cur.box = Math.min(cur.box + 1, 5); cur.due = addDays(t, INTERVALS[cur.box]); }
+    if (g === 'mid')  { cur.due = addDays(t, 1); }
+    if (g === 'bad')  {
+      cur.box = 0; cur.due = t;
+      if (!requeued.has(c.id)) { requeued.add(c.id); queue.splice(Math.min(idx + 4, queue.length), 0, c); }  // vuelve unas tarjetas después
+    }
+    state[c.id] = cur; results[g]++; save();
+    idx++;
+    if (idx >= queue.length) finish(false); else showCard();
+  }
+
+  function finish(early){
+    synth?.cancel();
+    const t = today();
+    if (results.good + results.mid + results.bad > 0 && meta.lastDay !== t) {
+      meta.streak = meta.lastDay === addDays(t, -1) ? meta.streak + 1 : 1; meta.lastDay = t; save();
+    }
+    $('session').hidden = true; $('done').hidden = false;
+    const n = results.good + results.mid + results.bad;
+    $('doneTitle').textContent = early ? 'Sesión pausada' : '¡Sesión terminada!';
+    $('doneText').textContent = n
+      ? `Hiciste ${n} tarjeta${n > 1 ? 's' : ''}: ${results.good} las sabías, ${results.mid} más o menos y ${results.bad} para seguir practicando. Racha: ${meta.streak} día${meta.streak === 1 ? '' : 's'}.`
+      : 'No calificaste ninguna tarjeta todavía.';
+  }
+
+  fillTopics(); drawHome();
+})();
+</script>
+</body>
+</html>
